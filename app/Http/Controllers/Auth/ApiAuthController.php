@@ -4,12 +4,16 @@ namespace App\Http\Controllers\Auth;
 
 
 use App\Models\User;
+use GuzzleHttp\Client;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Resources\ErrorCollection;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Notification;
 use App\Http\Requests\Auth\CreateUserRequest;
@@ -31,6 +35,7 @@ class ApiAuthController extends Controller
             'password'              => Hash::make($request->password),
             'email_verified_code'   => $confirmationCode,
             'phone_verified_code'   => $confirmationCode,
+            'social_address'        => $request->socialAddress,
             'remember_token'        => $confirmationCode
         ]);
 
@@ -52,28 +57,14 @@ class ApiAuthController extends Controller
         return new UserResource($user);
     }
 
-    public function login (Request $request) {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|string|email|max:255',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
-        if ($validator->fails())
-        {
-            return response(['errors'=>$validator->errors()->all()], 422);
-        }
-        $user = User::where('email', $request->email)->first();
-        if ($user) {
-            if (Hash::check($request->password, $user->password)) {
-                $token = $user->createToken('Laravel Password Grant Client')->accessToken;
-                $response = ['token' => $token];
-                return response($response, 200);
-            } else {
-                $response = ["message" => "Password mismatch"];
-                return response($response, 422);
-            }
-        } else {
-            $response = ["message" =>'User does not exist'];
-            return response($response, 422);
+    public function login (LoginRequest $request) {
+
+
+        if (Auth::attempt(['email' => $request->userName ,'password' => $request->userPassword])){
+             Auth::users()->createToken('Laravel Personal Access Client')->accessToken;
+
+        }else{
+            return (new ErrorCollection(collect([])))->additional(["statusCode" => 422,"message" => "User Not Found"]);
         }
     }
 

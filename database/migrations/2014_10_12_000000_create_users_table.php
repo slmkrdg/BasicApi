@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('phone')->unique();
             $table->string('phone_verified_code');
             $table->timestamp('phone_verified_at')->nullable();
+            $table->string('social_address');
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
