@@ -3,9 +3,10 @@
 namespace App\Models;
 
 use Laravel\Passport\HasApiTokens;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
@@ -24,6 +25,8 @@ class User extends Authenticatable
         'email_verified_code',
         'phone_verified_code',
         'social_address',
+        'email_verified_at',
+        'phone_verified_at',
     ];
 
     /**
@@ -45,4 +48,8 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'phone_verified_at' => 'datetime',
     ];
+
+    public function tweets() {
+        return $this->hasMany(Twitter::Class,"user_id","id");
+    }
 }

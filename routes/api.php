@@ -2,6 +2,8 @@
 
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Controllers\Users\UserController;
 use App\Http\Controllers\Auth\ApiAuthController;
 
 /*
@@ -19,11 +21,16 @@ use App\Http\Controllers\Auth\ApiAuthController;
 Route::group(["prefix" => "v1"], function () { 
     Route::group(["prefix" => "users"], function () { 
         // public routes
-        Route::post("login",[ApiAuthController::class,"login"]);
-        Route::post("register",[ApiAuthController::class,"register"]);
+        Route::post("login",[ApiAuthController::class,"login"])->middleware(["middlewareInputValidator:". LoginRequest::class]);
+        Route::post("register",[UserController::class,"register"]);
+        Route::post("validation",[UserController::class,"validation"]);
     });    
 
     Route::middleware('auth:api')->group(function () {
-        Route::post("logout",[ApiAuthController::class,"logout"]);
+        Route::group(["prefix" => "twitter"], function () { 
+            Route::get("tweets/page/{pageNumber?}",[UserController::class,"getUserTweets"]);
+            Route::post("tweets",[UserController::class,"setUserTweets"]);
+            Route::patch("tweets/{tweetId}",[UserController::class,"updateUserTweets"]);
+        });
     });
 });
