@@ -1,5 +1,5 @@
-For project work
-    * composer install
-    * php artisan migrate   
-    * php artisan passport:install 
+For project work <br>
+    * composer install <br>
+    * php artisan migrate    <br>
+    * php artisan passport:install  <br>
  
